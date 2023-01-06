@@ -1,12 +1,14 @@
 import TelegramBot from 'node-telegram-bot-api';
-import { getReply, GREETING_TEXT } from './utils/texts';
+import { getReply, GREETING_TEXT } from './constants/texts';
 import { removeWordFromString } from './utils/utils';
 import { COMMANDS } from './utils/comands';
 import { addBirthday } from './db/actions/birthday';
-import { IUser } from './db/types/user';
+import { IAdmin, IUser } from './db/types/user';
 import { Roles } from './db/types/roles';
 import { IChat } from './db/types/chat';
 import { addChat, addUserToChat } from './db/actions/chat';
+import { Timezones } from './constants/timezones';
+import { Languages } from './constants/languages';
 
 const telegramToken = process.env.TELEGRAM_PRIVATE_KEY;
 
@@ -19,33 +21,33 @@ if (bot) {
 
   bot.onText(COMMANDS.start, async (msg) => {
     const chatId = msg?.chat?.id;
-    const chatLanguage = 'ru';
-    const usersAmount = 1;
+    const chatLanguage = Languages.Ru;
+    const usersAmount = 0;
     const username = msg?.from?.username;
     const userId = msg?.from?.id;
-    let adminUser: IUser | undefined;
 
-    if (username && userId) {
-      adminUser = {
-        username,
-        telegramId: userId,
-        timeZone: 'Europe/Moscow',
-        role: Roles.superAdmin,
-      };
-    }
+    try {
+      if (chatId && username && userId) {
+        const adminUser: IAdmin = {
+          username,
+          telegramId: userId,
+          timeZone: Timezones.EuropeMoscow,
+          role: Roles.superAdmin,
+        };
 
+        const chat: IChat = {
+          chatId,
+          chatLanguage,
+          usersAmount,
+          users: [],
+          admins: [adminUser],
+        };
 
-    if (chatId && adminUser) {
-      const chat: IChat = {
-        chatId,
-        chatLanguage,
-        usersAmount,
-        users: [],
-        admins: [adminUser],
-      };
-
-      await addChat(chat);
-      bot.sendMessage(chatId, GREETING_TEXT);
+        await addChat(chat);
+        await bot.sendMessage(chatId, GREETING_TEXT);
+      }
+    } catch (e) {
+      console.error('Error on /start', e);
     }
   });
 

@@ -6,6 +6,7 @@ const UserSchema = new mongoose.Schema<IUser>({
   telegramId: String,
   timeZone: String,
   role: String,
+  birthday: Date,
 });
 
 export default UserSchema;

@@ -5,4 +5,8 @@ export interface IUser {
   telegramId: number,
   timeZone: string,
   role: Roles,
+  birthday?: Date,
+}
+
+export interface IAdmin extends Omit<IUser, 'birthday'> {
 }
