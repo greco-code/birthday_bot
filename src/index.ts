@@ -3,6 +3,9 @@ import * as mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
 dotenv.config();
+
+import './bot';
+
 const app = express();
 app.use(express.json());
 
